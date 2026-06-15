@@ -307,16 +307,21 @@
                 
                 <div class="space-y-3 pt-4">
                     <div class="flex items-center gap-3 text-gray-300 text-sm">
-                        <i class="fa-solid fa-envelope text-indigo-400 w-5"></i> mohamed.aynouche@example.com
+                        <i class="fa-solid fa-envelope text-indigo-400 w-5"></i> khozwita173@gmail.com
                     </div>
                 </div>
             </div>
 
-            <form class="md:col-span-6 space-y-4" @submit.prevent="alert(currentLang === 'en' ? 'Message sent successfully!' : 'Message envoyé avec succès!')">
-                <input type="text" :placeholder="currentLang === 'en' ? 'Full Name' : 'Nom Complet'" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-                <input type="email" :placeholder="currentLang === 'en' ? 'Email Address' : 'Adresse Email'" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500">
-                <textarea :placeholder="currentLang === 'en' ? 'Your Message' : 'Votre Message'" rows="4" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500"></textarea>
-                <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm py-4 rounded-xl shadow-lg" x-text="t('contactBtn')"></button>
+            <form class="md:col-span-6 space-y-4" @submit.prevent="submitForm($event)">
+                <input type="text" name="name" :placeholder="currentLang === 'en' ? 'Full Name' : 'Nom Complet'" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <input type="email" name="email" :placeholder="currentLang === 'en' ? 'Email Address' : 'Adresse Email'" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                <textarea name="message" :placeholder="currentLang === 'en' ? 'Your Message' : 'Votre Message'" rows="4" required class="w-full bg-[#030712]/60 border border-gray-800 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-indigo-500"></textarea>
+                
+                <button type="submit" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-sm py-4 rounded-xl shadow-lg transition-opacity duration-300 flex items-center justify-center gap-2" :disabled="isSubmitting">
+                    <span x-show="!isSubmitting" x-text="t('contactBtn')"></span>
+                    <span x-show="isSubmitting" x-text="currentLang === 'en' ? 'Sending...' : 'Envoi en cours...' "></span>
+                    <i x-show="isSubmitting" class="fa-solid fa-spinner animate-spin"></i>
+                </button>
             </form>
         </div>
     </section>
@@ -333,6 +338,7 @@
                 titleIndex: 0,
                 charIndex: 0,
                 isDeleting: false,
+                isSubmitting: false, // Form loading state variable
                 
                 translations: {
                     en: {
@@ -421,36 +427,82 @@
                         : ['Développeur Front End', 'Designer Web UI/UX', 'Développeur de Jeux'];
                 },
 
-                init() { this.typeEffect(); },
+                init() { 
+                    this.typeEffect(); 
+                },
+
+                t(key) {
+                    return this.translations[this.currentLang][key] || '';
+                },
+
                 toggleLang() {
                     this.currentLang = this.currentLang === 'en' ? 'fr' : 'en';
-                    document.documentElement.lang = this.currentLang;
-                    this.titleIndex = 0; this.charIndex = 0; this.isDeleting = false;
+                    this.animatedTitle = '';
+                    this.titleIndex = 0;
+                    this.charIndex = 0;
+                    this.isDeleting = false;
                 },
-                t(key) { return this.translations[this.currentLang][key]; },
+
                 updateCursor(e) {
                     const cursor = document.getElementById('custom-cursor');
-                    if(cursor) { cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px'; }
+                    if(cursor) {
+                        cursor.style.left = e.clientX + 'px';
+                        cursor.style.top = e.clientY + 'px';
+                    }
                 },
+
                 typeEffect() {
-                    const currentTitles = this.getTitles();
-                    const fullText = currentTitles[this.titleIndex];
+                    const titles = this.getTitles();
+                    const currentTitle = titles[this.titleIndex];
+                    
                     if (this.isDeleting) {
-                        this.animatedTitle = fullText.substring(0, this.charIndex - 1);
+                        this.animatedTitle = currentTitle.substring(0, this.charIndex - 1);
                         this.charIndex--;
                     } else {
-                        this.animatedTitle = fullText.substring(0, this.charIndex + 1);
+                        this.animatedTitle = currentTitle.substring(0, this.charIndex + 1);
                         this.charIndex++;
                     }
+
                     let typeSpeed = this.isDeleting ? 40 : 100;
-                    if (!this.isDeleting && this.charIndex === fullText.length) {
-                        typeSpeed = 2000; this.isDeleting = true;
+
+                    if (!this.isDeleting && this.charIndex === currentTitle.length) {
+                        typeSpeed = 2000; 
+                        this.isDeleting = true;
                     } else if (this.isDeleting && this.charIndex === 0) {
                         this.isDeleting = false;
-                        this.titleIndex = (this.titleIndex + 1) % currentTitles.length;
-                        typeSpeed = 400;
+                        this.titleIndex = (this.titleIndex + 1) % titles.length;
+                        typeSpeed = 500; 
                     }
+
                     setTimeout(() => this.typeEffect(), typeSpeed);
+                },
+
+                // AJAX Form Submission Handler via Endpoint Form provider
+                submitForm(event) {
+                    const form = event.target;
+                    this.isSubmitting = true;
+
+                    // Formspree/Web3Forms Endpoint - Paste your custom API key ID here
+                    const endpoint = "https://formspree.io/f/mgobdpoo";
+
+                    fetch(endpoint, {
+                        method: 'POST',
+                        body: new FormData(form),
+                        headers: { 'Accept': 'application/json' }
+                    })
+                    .then(response => {
+                        this.isSubmitting = false;
+                        if (response.ok) {
+                            alert(this.currentLang === 'en' ? 'Message sent successfully!' : 'Message envoyé avec succès!');
+                            form.reset();
+                        } else {
+                            alert(this.currentLang === 'en' ? 'Oops! There was a problem submitting your form.' : 'Oups! Un problème est survenu lors de l\'envoi.');
+                        }
+                    })
+                    .catch(error => {
+                        this.isSubmitting = false;
+                        alert(this.currentLang === 'en' ? 'Connection error. Please retry.' : 'Erreur de connexion. Veuillez réessayer.');
+                    });
                 }
             }
         }
