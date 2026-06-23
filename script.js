@@ -29,9 +29,13 @@ function portfolioData() {
                 projectsHeadline: 'Featured Masterpieces', 
                 fAll: 'All Work', fWeb: 'Web Projects', fGames: 'Game Projects', statusSoon: 'Coming Soon', statusLive: 'Live Demo',
 
-                // المشروع الجديد المضاف
+                // المشروع الأول
                 cvTitle: 'AI-Powered CV Builder',
                 cvDesc: 'A smart web-based application designed to help users build, style, and export professional, responsive resumes instantly with live layout rendering.',
+
+                // المشروع الثاني الجديد
+                chessTitle: 'Chess Club Hub',
+                chessDesc: 'An elegant and interactive web application tailored for chess players, featuring interactive game boards, strategic UI layout elements, and clean animations.',
 
                 wp1Title: 'The Cyber-Grid Ecosystem',
                 wp1Desc: 'Unleash ultra-performance. An immersive digital interface forged to break standard web limitations and change how you browse data forever.',
@@ -72,9 +76,13 @@ function portfolioData() {
                 projectsHeadline: 'Chefs-d\'Œuvre Sélectionnés', 
                 fAll: 'Tous', fWeb: 'Projets Web', fGames: 'Projets de Jeux', statusSoon: 'Bientôt Disponible', statusLive: 'Démo Live',
 
-                // المشروع الجديد المضاف بالفرنسية
+                // المشروع الأول فرنسي
                 cvTitle: 'Générateur de CV Intelligent',
                 cvDesc: 'Une application web intuitive conçue pour aider les utilisateurs à créer, styliser et exporter des CV professionnels et réactifs avec un rendu en temps réel.',
+
+                // المشروع الثاني فرنسي
+                chessTitle: 'Chess Club Hub',
+                chessDesc: 'Une application web élégante et interactive adaptée aux joueurs d\'échecs, dotée d\'un échiquier virtuel et d\'animations d\'interface fluides.',
 
                 wp1Title: 'L\'Écosystème Cyber-Grid',
                 wp1Desc: 'Libérez l\'ultra-performance. Une interface numérique immersive forgée pour briser les limites du web standard et transformer votre vision des données.',
